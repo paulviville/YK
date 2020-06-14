@@ -36,7 +36,10 @@ let gui_params = {
 
 	colors : {
 		background : 0xe0e0e0,
-		sphere_opacity : 0.3
+		sphere_opacity : 0.3,
+		surface_color : 0xBBFFBB,
+		surface_opacity : 0.3,
+		show_lines: true
 	},
 }
 
@@ -53,6 +56,9 @@ folder_angles.open();
 let folder_colors = gui.addFolder("Display");
 folder_colors.addColor(gui_params.colors, 'background').onChange(update_background);
 folder_colors.add(gui_params.colors, "sphere_opacity").min(0).max(1).step(0.1).onChange(update_mesh_display);
+folder_colors.add(gui_params.colors, "show_lines").onChange(update_lines_display);
+folder_colors.add(gui_params.colors, "surface_opacity").min(0).max(1).step(0.1).onChange(update_surface_display);
+folder_colors.addColor(gui_params.colors, 'surface_color').onChange(update_surface_display);
 
 
 let vZero = new THREE.Vector3();
@@ -69,6 +75,20 @@ function update_background()
 function update_mesh_display()
 {
 	sphere.material.opacity = gui_params.colors.sphere_opacity;
+}
+
+function update_lines_display()
+{
+	if(geodesics_surface.parent)
+		scene.remove(geodesics_surface);
+	else
+		scene.add(geodesics_surface);
+}
+
+function update_surface_display()
+{
+	// surface.material.color.copy(gui_params.colors.surface_color);
+	surface.material.opacity = gui_params.colors.surface_opacity;
 }
 
 function update_angles()
