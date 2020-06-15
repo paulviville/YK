@@ -1,13 +1,26 @@
 <html>
     <head>
-        <title>Partition Sphere</title>
+        <title>Indice de Directivité</title>
         <style>
             body { margin : 0;}
-            canvas {width: 100%; height: 100%;}
+			canvas {width: 100%; height: 100%;}
+			#info {	position: absolute;
+					top: 0px;
+					width: 100%;
+					padding: 10px;
+					box-sizing: border-box;
+					text-align: center;
+					user-select: none;
+					pointer-events: none;
+					z-index: 1; /* TODO Solve this in HTML */
+				}
         </style>
     </head>
 
     <body>
+		<div id="info">Calcul de l'indice de directivité <br/>
+			en fonction de l'angle d'ouverture d'une source sonore<br/>
+		</div>
 		<script src="three.js"></script>
 		<script src="OrbitControls.js"></script>
         <script src="sphere.js"></script>
