@@ -49,8 +49,8 @@ let folder_angles = gui.addFolder("Paramètres");
 folder_angles.add(gui_params.angles, 'alpha').name("vertical").min(0).max(179).step(1).onChange(update_angles);
 folder_angles.add(gui_params.angles, 'beta').name("horizontal").min(0).max(179).step(1).onChange(update_angles);
 folder_angles.add(gui_params.angles, 'nb_divs').name("integration divs").min(10).max(500).step(1).onChange(update_surface);
-folder_angles.add(gui_params.angles, 'ratio').name("Dir").step(0.001).listen();
-folder_angles.add(gui_params.angles, 'directivite').name("Ind Dir").step(0.001).listen();
+folder_angles.add(gui_params.angles, 'ratio').name("Dir").step(0.0001).listen();
+folder_angles.add(gui_params.angles, 'directivite').name("Ind Dir").step(0.0001).listen();
 folder_angles.open();
 
 let folder_colors = gui.addFolder("Display");
@@ -203,7 +203,7 @@ function update_surface()
 	scene.add(geodesics_surface);
 
 	gui_params.angles.ratio = area / (4 * Math.PI);
-	gui_params.angles.directivite = 10*Math.log(1 / gui_params.angles.ratio);
+	gui_params.angles.directivite = 10*Math.log10(1 / gui_params.angles.ratio);
 }
 
 // function update_ratio()
