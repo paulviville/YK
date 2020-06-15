@@ -30,8 +30,8 @@ let gui_params = {
 		alpha: 30,
 		beta: 45,
 		nb_divs: 10,
-		ratio: 1
-
+		ratio: 1,
+		directivite: 1
 	},
 
 	colors : {
@@ -45,12 +45,12 @@ let gui_params = {
 
 let gui = new dat.GUI({autoPlace: true, hideable: false});
 
-// gui.add(showing, "partition").onChange(require_update);
-let folder_angles = gui.addFolder("Angles");
-folder_angles.add(gui_params.angles, 'alpha').min(0).max(180).step(1).onChange(update_angles);
-folder_angles.add(gui_params.angles, 'beta').min(0).max(180).step(1).onChange(update_angles);
-folder_angles.add(gui_params.angles, 'nb_divs').min(10).max(500).step(1).onChange(update_surface);
-let ratio = folder_angles.add(gui_params.angles, 'ratio').step(0.001).listen();
+let folder_angles = gui.addFolder("Paramètres");
+folder_angles.add(gui_params.angles, 'alpha').name("vertical").min(0).max(179).step(1).onChange(update_angles);
+folder_angles.add(gui_params.angles, 'beta').name("horizontal").min(0).max(179).step(1).onChange(update_angles);
+folder_angles.add(gui_params.angles, 'nb_divs').name("integration divs").min(10).max(500).step(1).onChange(update_surface);
+folder_angles.add(gui_params.angles, 'ratio').name("Dir").step(0.001).listen();
+folder_angles.add(gui_params.angles, 'directivite').name("Ind Dir").step(0.001).listen();
 folder_angles.open();
 
 let folder_colors = gui.addFolder("Display");
@@ -93,21 +93,37 @@ function update_surface_display()
 
 function update_angles()
 {
-	let alpha = gui_params.angles.alpha * Math.PI / 180;
-	let beta = gui_params.angles.beta * Math.PI / 180;
+	// let alpha = gui_params.angles.alpha * Math.PI / 180;
+	// let beta = gui_params.angles.beta * Math.PI / 180;
 
-	points[0].set(0, 0, 1);
-	points[1].set(0, 0, 1);
-	points[2].set(0, 0, 1);
-	points[3].set(0, 0, 1);
-	points[0].applyAxisAngle(vX, -alpha / 2);
-	points[0].applyAxisAngle(vY, -beta / 2);
-	points[1].applyAxisAngle(vX, alpha / 2);
-	points[1].applyAxisAngle(vY, -beta / 2);
-	points[2].applyAxisAngle(vX, alpha / 2);
-	points[2].applyAxisAngle(vY, beta / 2);
-	points[3].applyAxisAngle(vX, -alpha / 2);
-	points[3].applyAxisAngle(vY, beta / 2);
+	// points[0].set(0, 0, 1);
+	// points[1].set(0, 0, 1);
+	// points[2].set(0, 0, 1);
+	// points[3].set(0, 0, 1);
+	// points[0].applyAxisAngle(vX, -alpha / 2);
+	// points[0].applyAxisAngle(vY, -beta / 2);
+	// points[1].applyAxisAngle(vX, alpha / 2);
+	// points[1].applyAxisAngle(vY, -beta / 2);
+	// points[2].applyAxisAngle(vX, alpha / 2);
+	// points[2].applyAxisAngle(vY, beta / 2);
+	// points[3].applyAxisAngle(vX, -alpha / 2);
+	// points[3].applyAxisAngle(vY, beta / 2);
+	let alpha = gui_params.angles.alpha * Math.PI / 180 / 2;
+	let beta = gui_params.angles.beta * Math.PI / 180 / 2;
+
+	// let sina = Math.sin(alpha);
+	// let sinb = Math.sin(beta);
+	// points[0].set(-sinb, -sina, 1);
+	// points[1].set(sinb, -sina, 1);
+	// points[2].set(sinb, sina, 1);
+	// points[3].set(-sinb, sina, 1);
+
+	let A = Math.sqrt(1 / Math.pow(Math.cos(alpha), 2) - 1);
+	let B = Math.sqrt(1 / Math.pow(Math.cos(beta), 2) - 1);
+	points[0].set(-B, -A, 1).normalize();
+	points[1].set(B, -A, 1).normalize();
+	points[2].set(B, A, 1).normalize();
+	points[3].set(-B, A, 1).normalize();
 
     points_meshes[0].position.copy(points[0]);
     points_meshes[1].position.copy(points[1]);
@@ -187,6 +203,7 @@ function update_surface()
 	scene.add(geodesics_surface);
 
 	gui_params.angles.ratio = area / (4 * Math.PI);
+	gui_params.angles.directivite = 10*Math.log(1 / gui_params.angles.ratio);
 }
 
 // function update_ratio()
@@ -308,21 +325,34 @@ function init_scene()
 	let vY = new THREE.Vector3(0, 1, 0);
 	let vZ = new THREE.Vector3(0, 0, 1);
 
-	let alpha = gui_params.angles.alpha * Math.PI / 180;
-	let beta = gui_params.angles.beta * Math.PI / 180;
+	let alpha = gui_params.angles.alpha * Math.PI / 180 / 2;
+	let beta = gui_params.angles.beta * Math.PI / 180 / 2;
 	points = new Array(4);
-	points[0] = new THREE.Vector3(0, 0, 1);
-	points[1] = new THREE.Vector3(0, 0, 1);
-	points[2] = new THREE.Vector3(0, 0, 1);
-	points[3] = new THREE.Vector3(0, 0, 1);
-	points[0].applyAxisAngle(vX, -alpha / 2);
-	points[0].applyAxisAngle(vY, -beta / 2);
-	points[1].applyAxisAngle(vX, alpha / 2);
-	points[1].applyAxisAngle(vY, -beta / 2);
-	points[2].applyAxisAngle(vX, alpha / 2);
-	points[2].applyAxisAngle(vY, beta / 2);
-	points[3].applyAxisAngle(vX, -alpha / 2);
-	points[3].applyAxisAngle(vY, beta / 2);
+
+	let A = Math.sqrt(1 / Math.pow(Math.cos(alpha), 2) - 1);
+	let B = Math.sqrt(1 / Math.pow(Math.cos(beta), 2) - 1);
+	points[0]= new THREE.Vector3(-B, -A, 1).normalize();
+	points[1]= new THREE.Vector3(B, -A, 1).normalize();
+	points[2]= new THREE.Vector3(B, A, 1).normalize();
+	points[3]= new THREE.Vector3(-B, A, 1).normalize();
+	// let sina = Math.sin(alpha);
+	// let sinb = Math.sin(beta);
+	// points[0] = new THREE.Vector3(-sinb, -sina, 1);
+	// points[1] = new THREE.Vector3(sinb, -sina, 1);
+	// points[2] = new THREE.Vector3(sinb, sina, 1);
+	// points[3] = new THREE.Vector3(-sinb, sina, 1);
+	// points[0] = new THREE.Vector3(0, 0, 1);
+	// points[1] = new THREE.Vector3(0, 0, 1);
+	// points[2] = new THREE.Vector3(0, 0, 1);
+	// points[3] = new THREE.Vector3(0, 0, 1);
+	// points[0].applyAxisAngle(vX, -alpha);
+	// points[0].applyAxisAngle(vY, -beta);
+	// points[1].applyAxisAngle(vX, alpha);
+	// points[1].applyAxisAngle(vY, -beta);
+	// points[2].applyAxisAngle(vX, alpha);
+	// points[2].applyAxisAngle(vY, beta);
+	// points[3].applyAxisAngle(vX, -alpha);
+	// points[3].applyAxisAngle(vY, beta);
 	points_meshes = new Array(4);
 	points_meshes[0] = new THREE.Mesh(branch_point_geometry, branch_point_material);
 	points_meshes[1] = new THREE.Mesh(branch_point_geometry, branch_point_material);
