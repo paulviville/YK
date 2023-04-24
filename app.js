@@ -87,7 +87,7 @@ function update_lines_display()
 
 function update_surface_display()
 {
-	// surface.material.color.copy(gui_params.colors.surface_color);
+	surface.material.color.copy(new THREE.Color(gui_params.colors.surface_color));
 	surface.material.opacity = gui_params.colors.surface_opacity;
 }
 
